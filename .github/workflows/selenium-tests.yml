@@ -9,6 +9,7 @@ on:
 jobs:
   test:
     runs-on: ubuntu-latest
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -22,13 +23,22 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
+          # Asegura que selenium esté instalado
+          pip install selenium pytest
 
       - name: Install Chrome
         uses: browser-actions/setup-chrome@v1
+        with:
+          chrome-version: stable
+
+      - name: Install ChromeDriver
+        uses: nanasess/setup-chromedriver@v2
 
       - name: Run Selenium tests
         env:
           BASE_URL: ${{ secrets.BASE_URL }}
           TEST_USER_EMAIL: ${{ secrets.TEST_USER_EMAIL }}
           TEST_USER_PASS: ${{ secrets.TEST_USER_PASS }}
-        run: pytest -v
+        run: |
+          echo "Running tests against $BASE_URL"
+          pytest -v --headless
